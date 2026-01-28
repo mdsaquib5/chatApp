@@ -1,91 +1,90 @@
 import express from "express";
 import cors from "cors";
+import http from "http";
+import { Server } from "socket.io";
 import connectDB from "./config/mongodb.js";
 import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import jwt from "jsonwebtoken";
 import "dotenv/config";
 
-import http from "http";
-import { Server } from "socket.io";
-import jwt from "jsonwebtoken";
-import Chat from "./models/chatModel.js";
-
 const app = express();
-const PORT = process.env.PORT || 4000;
+const server = http.createServer(app);
 
-// DB connect
-connectDB();
+// 🔥 Allowed origins (frontend + local)
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "https://chat-app-frontend-mu-six.vercel.app"
+];
 
-// Middlewares
-app.use(cors({
-    origin: "http://localhost:5173", // React/Vite port
-    credentials: true,
-}));
+// 🔥 EXPRESS CORS (for fetch / axios)
+app.use(
+    cors({
+        origin: allowedOrigins,
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE"],
+    })
+);
+
 app.use(express.json());
 
-// Test route
+// 🔥 SOCKET.IO CORS (IMPORTANT)
+const io = new Server(server, {
+    cors: {
+        origin: allowedOrigins,
+        methods: ["GET", "POST"],
+        credentials: true,
+    },
+});
+
+// DB
+connectDB();
+
+// Routes
 app.get("/", (req, res) => {
     res.send("API Working");
 });
 
-// REST APIs
 app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
 
-/* ================= SOCKET.IO SETUP ================= */
-
-const server = http.createServer(app);
-
-const io = new Server(server, {
-    cors: {
-        origin: "https://chat-app-frontend-mu-six.vercel.app",
-        methods: ["GET", "POST"],
-    },
-});
-
-// 🔐 Socket JWT Auth
+// 🔐 SOCKET AUTH (JWT)
 io.use((socket, next) => {
-    const token = socket.handshake.auth?.token;
-
-    if (!token) {
-        return next(new Error("No token provided"));
-    }
-
     try {
+        const token = socket.handshake.auth.token;
+        if (!token) return next(new Error("No token"));
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        socket.user = decoded; // { userId, username }
+        socket.user = decoded;
         next();
     } catch (err) {
         next(new Error("Invalid token"));
     }
 });
 
-// Socket connection
+// 💬 SOCKET CONNECTION
 io.on("connection", (socket) => {
-    console.log("🟢 User connected:", socket.user.username);
+    console.log("User connected:", socket.user.username);
 
-    // Receive message
     socket.on("sendMessage", async (message) => {
-        try {
-            const chat = await Chat.create({
-                userId: socket.user.userId,
-                username: socket.user.username,
-                message,
-            });
+        const chat = {
+            userId: socket.user.id,
+            username: socket.user.username,
+            message,
+        };
 
-            // 🔥 Send to all connected users
-            io.emit("receiveMessage", chat);
-        } catch (err) {
-            console.log("Chat save error:", err);
-        }
+        // broadcast to all users
+        io.emit("receiveMessage", chat);
     });
 
     socket.on("disconnect", () => {
-        console.log("🔴 User disconnected:", socket.user.username);
+        console.log("User disconnected");
     });
 });
 
-// Start server
+// SERVER START
+const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
