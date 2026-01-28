@@ -1,29 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
-
-let socket;
 
 const ChatBox = () => {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
+    const socketRef = useRef(null);
+
+    const user = JSON.parse(localStorage.getItem("user"));
+    // user = { id, username }
 
     useEffect(() => {
         const token = localStorage.getItem("token");
 
-        // socket connect with JWT
-        socket = io("http://localhost:4000", {
-            auth: {
-                token,
-            },
+        socketRef.current = io("http://localhost:4000", {
+            auth: { token },
+            transports: ["websocket"],
         });
 
-        // receive messages
-        socket.on("receiveMessage", (chat) => {
+        socketRef.current.on("connect", () => {
+            console.log("Socket connected");
+        });
+
+        socketRef.current.on("receiveMessage", (chat) => {
             setMessages((prev) => [...prev, chat]);
         });
 
+        socketRef.current.on("connect_error", (err) => {
+            console.error("Socket error:", err.message);
+        });
+
         return () => {
-            socket.disconnect();
+            socketRef.current.disconnect();
         };
     }, []);
 
@@ -31,8 +38,18 @@ const ChatBox = () => {
         e.preventDefault();
         if (!message.trim()) return;
 
-        // send message via socket
-        socket.emit("sendMessage", message);
+        socketRef.current.emit("sendMessage", message);
+
+        // 🔥 instantly show own message
+        setMessages((prev) => [
+            ...prev,
+            {
+                message,
+                username: user.username,
+                userId: user.id,
+                self: true,
+            },
+        ]);
 
         setMessage("");
     };
@@ -40,32 +57,30 @@ const ChatBox = () => {
     return (
         <div className="chat-container">
             <div className="chat-header">
-                <h1 className="chat-title">Realtime Chat</h1>
-                <p>Connected users can chat live 🚀</p>
+                <h2>Realtime Chat</h2>
             </div>
 
-            {/* CHAT MESSAGES */}
-            <div className="chat-box">
+            <div className="chat-messages">
                 {messages.map((msg, index) => (
-                    <div key={index} className="chat-message">
-                        <span className="username">{msg.username}</span>
+                    <div
+                        key={index}
+                        className={`chat-bubble ${msg.userId === user.id ? "own" : "other"
+                            }`}
+                    >
+                        <span className="chat-user">{msg.username}</span>
                         <p>{msg.message}</p>
                     </div>
                 ))}
             </div>
 
-            {/* INPUT */}
             <form onSubmit={handleSubmit} className="chat-form">
                 <input
-                    className="chat-input"
                     type="text"
-                    placeholder="Type a message..."
+                    placeholder="Type message..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                 />
-                <button className="send-btn" type="submit">
-                    Send
-                </button>
+                <button type="submit">Send</button>
             </form>
         </div>
     );
