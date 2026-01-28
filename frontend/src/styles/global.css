@@ -1,119 +1,296 @@
-.chatBox {
-  width: 380px;
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.header h2 {
-  margin: 0;
-  color: #333;
-}
-
-.header p {
-  font-size: 13px;
-  color: #777;
-}
-
-.todoForm {
+/* global.css - Add these styles */
+.login-register-container {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.todoForm input {
-  flex: 1;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  outline: none;
-}
-
-.todoForm input:focus {
-  border-color: #667eea;
-}
-
-.todoForm button {
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: none;
-  background: #667eea;
-  color: white;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.todoForm button:hover {
-  background: #5563d6;
-}
-
-.todoList {
-  max-height: 220px;
-  overflow-y: auto;
-}
-
-.todoItem {
-  background: #f5f6ff;
-  padding: 10px 12px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  display: flex;
+  justify-content: center;
   align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.todoItem span {
-  color: #333;
-  font-size: 14px;
-}
-
-.empty {
-  text-align: center;
-  color: #999;
-  font-size: 14px;
-}
-
-.auth-container {
+.auth-card {
   background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  width: 50%;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.auth-header {
+  background: linear-gradient(to right, #667eea, #764ba2);
+  padding: 40px 30px;
   text-align: center;
+  color: white;
+}
+
+.auth-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.auth-tabs {
+  display: flex;
+  background: #f7f9fc;
+  padding: 0;
+}
+
+.auth-tab {
+  flex: 1;
+  text-align: center;
+  padding: 18px 10px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #666;
+  border-bottom: 3px solid transparent;
+}
+
+.auth-tab.active {
+  color: #667eea;
+  border-bottom: 3px solid #667eea;
+  background: white;
 }
 
 .auth-form {
-  display: flex;
-  flex-direction: column;
+  padding: 30px;
 }
 
-.auth-form input {
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+.input-group {
+  position: relative;
+  margin-bottom: 24px;
 }
 
-.auth-form button {
-  padding: 0.5rem;
-  border: none;
-  border-radius: 5px;
-  background: #007bff;
+.auth-input {
+  width: 100%;
+  padding: 16px 16px 16px 50px;
+  border: 2px solid #e1e5eb;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.input-icon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0aec0;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(to right, #667eea, #764ba2);
   color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
 }
 
-.auth-form button:hover {
-  background: #0056b3;
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
 }
 
-.toggle-link {
-  color: #007bff;
+.switch-text {
+  text-align: center;
+  margin-top: 24px;
+  color: #666;
+}
+
+.switch-link {
+  color: #667eea;
+  font-weight: 600;
   cursor: pointer;
-  margin-top: 1rem;
+  margin-left: 5px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.switch-link:hover {
+  text-decoration: underline;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 24px 0;
+  color: #a0aec0;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e1e5eb;
+}
+
+.divider span {
+  padding: 0 15px;
+}
+
+.social-login {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.social-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e1e5eb;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.social-btn:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.google-btn {
+  color: #db4437;
+}
+
+.github-btn {
+  color: #333;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+.forgot-link {
+  color: #667eea;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0aec0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 18px;
+}
+
+/* Animation for form switch */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-form-content {
+  animation: fadeIn 0.4s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .auth-card {
+    max-width: 100%;
+  }
+  
+  .auth-form {
+    padding: 20px;
+  }
+  
+  .social-login {
+    flex-direction: column;
+  }
+}
+
+
+/* Add to global.css */
+.chat-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 0 20px;
+}
+
+.chat-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.chat-title {
+  font-size: 32px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.chat-form {
+  display: flex;
+  gap: 10px;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.chat-input {
+  flex: 1;
+  padding: 14px 20px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.send-btn {
+  padding: 14px 30px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
 }

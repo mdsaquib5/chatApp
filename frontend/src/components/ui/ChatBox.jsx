@@ -2,41 +2,57 @@ import { useState } from "react";
 
 const ChatBox = () => {
     const [chat, setChat] = useState("");
-    const [chats, setChats] = useState([]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!chat.trim()) return;
 
         const token = localStorage.getItem("token");
 
-        const res = await fetch("http://localhost:4000/api/chat/send", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ message: chat }),
-        });
+        try {
+            const res = await fetch("http://localhost:4000/api/chat/send", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ message: chat }),
+            });
 
-        const data = await res.json();
+            const data = await res.json();
 
-        if (res.ok) {
-            setChats([...chats, data.message]);
-            setChat("");
+            if (res.ok) {
+                setChat("");
+                alert("Message sent!");
+            } else {
+                alert(data.message || "Error sending message");
+            }
+        } catch (error) {
+            alert("Failed to send message. Please try again.");
         }
     };
 
     return (
-        <>
-            <form onSubmit={handleSubmit}>
-                <input value={chat} onChange={(e) => setChat(e.target.value)} />
-                <button>Send</button>
-            </form>
+        <div className="chat-container">
+            <div className="chat-header">
+                <h1 className="chat-title">Send Message</h1>
+                <p>Type your message below</p>
+            </div>
 
-            {chats.map((c, i) => (
-                <p key={i}>{c}</p>
-            ))}
-        </>
+            <form onSubmit={handleSubmit} className="chat-form">
+                <input
+                    className="chat-input"
+                    type="text"
+                    placeholder="Enter your message..."
+                    value={chat}
+                    onChange={(e) => setChat(e.target.value)}
+                    required
+                />
+                <button className="send-btn" type="submit">
+                    Send
+                </button>
+            </form>
+        </div>
     );
 };
 
