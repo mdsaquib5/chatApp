@@ -14,7 +14,6 @@ const server = http.createServer(app);
 // 🔥 Allowed origins (frontend + local)
 const allowedOrigins = [
     "http://localhost:5173",
-    "http://127.0.0.1:3000",
     "https://chat-app-frontend-mu-six.vercel.app"
 ];
 
