@@ -1,52 +1,67 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
+
+let socket;
 
 const ChatBox = () => {
-    const [chat, setChat] = useState("");
+    const [message, setMessage] = useState("");
+    const [messages, setMessages] = useState([]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!chat.trim()) return;
-
+    useEffect(() => {
         const token = localStorage.getItem("token");
 
-        try {
-            const res = await fetch("http://localhost:4000/api/chat/send", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ message: chat }),
-            });
+        // socket connect with JWT
+        socket = io("http://localhost:4000", {
+            auth: {
+                token,
+            },
+        });
 
-            const data = await res.json();
+        // receive messages
+        socket.on("receiveMessage", (chat) => {
+            setMessages((prev) => [...prev, chat]);
+        });
 
-            if (res.ok) {
-                setChat("");
-                alert("Message sent!");
-            } else {
-                alert(data.message || "Error sending message");
-            }
-        } catch (error) {
-            alert("Failed to send message. Please try again.");
-        }
+        return () => {
+            socket.disconnect();
+        };
+    }, []);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!message.trim()) return;
+
+        // send message via socket
+        socket.emit("sendMessage", message);
+
+        setMessage("");
     };
 
     return (
         <div className="chat-container">
             <div className="chat-header">
-                <h1 className="chat-title">Send Message</h1>
-                <p>Type your message below</p>
+                <h1 className="chat-title">Realtime Chat</h1>
+                <p>Connected users can chat live 🚀</p>
             </div>
 
+            {/* CHAT MESSAGES */}
+            <div className="chat-box">
+                {messages.map((msg, index) => (
+                    <div key={index} className="chat-message">
+                        <span className="username">{msg.username}</span>
+                        <p>{msg.message}</p>
+                    </div>
+                ))}
+            </div>
+
+            {/* INPUT */}
             <form onSubmit={handleSubmit} className="chat-form">
                 <input
                     className="chat-input"
                     type="text"
-                    placeholder="Enter your message..."
-                    value={chat}
-                    onChange={(e) => setChat(e.target.value)}
-                    required
+                    placeholder="Type a message..."
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
                 />
                 <button className="send-btn" type="submit">
                     Send
